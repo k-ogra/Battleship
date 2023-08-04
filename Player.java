@@ -8,8 +8,4 @@ public class Player {
         this.attackboard = new AttackBoard();
         this.name = name;
     }
-
-
-
-
 }

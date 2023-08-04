@@ -1,8 +1,9 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 public class PlayerBoard {
     final int BOARD_SIZE = 10;
 
-    public Ship[] ships;
+    public ArrayList<Ship> ships;
     public String[][] playerboard = new String[BOARD_SIZE][BOARD_SIZE];
 
 
@@ -11,8 +12,7 @@ public class PlayerBoard {
         for (String[] row: playerboard) {
             Arrays.fill(row, "~");
         }
-        ships = new Ship[5];
-
+        this.ships = new ArrayList<>();
     }
 
     public void PrintPlayerBoard() {
@@ -35,6 +35,20 @@ public class PlayerBoard {
         int endrow = secondcoordinate.charAt(0) - 65;
         int startcolumn = Integer.parseInt(firstcoordinate.replaceAll("[^0-9]", "")) - 1;
         int endcolumn = Integer.parseInt(secondcoordinate.replaceAll("[^0-9]", "")) - 1;
+
+        if (startrow > endrow) {
+            int temp = startrow;
+            startrow = endrow;
+            endrow = temp;
+        }
+        if (startcolumn > endcolumn) {
+            int temp = startcolumn;
+            startcolumn = endcolumn;
+            endcolumn = temp;
+        }
+
+
+
         // End MUST be greater than start
         if (startrow == endrow) {
             for (int i = startcolumn; i <= endcolumn; i++) {
@@ -49,15 +63,30 @@ public class PlayerBoard {
     }
 
     public void Attacked(String attackcoordinate) {
-        int row = attackcoordinate.charAt(0);
+        int row = attackcoordinate.charAt(0) - 65;
         int column = Integer.parseInt(attackcoordinate.replaceAll("[^0-9]", "")) - 1;
         if (playerboard[row][column] == "O") {
-            System.out.println("A ship has been hit");
+            System.out.println("A ship has been hit!");
         }
         else {
-            System.out.println("Attack missed");
+            System.out.println("Attack missed!");
         }
         playerboard[row][column] = "X";
+
+    }
+
+    public boolean CheckGameOver() {
+        int sunkcounter = 0;
+        for (Ship ship : ships) {
+            ship.CheckIfSunk();
+            if (ship.isSunk) {
+                sunkcounter++;
+            }
+        }
+        if (sunkcounter == 5) {
+            return true;
+        }
+        return false;
 
     }
 
