@@ -12,10 +12,10 @@ public class AttackBoard {
         }
     }
 
-    public void Attack(String attackcoordinate) {
-        int row = attackcoordinate.charAt(0);
+    public void Attack(String attackcoordinate, String attackedsymbol) {
+        int row = attackcoordinate.charAt(0) - 65;
         int column = Integer.parseInt(attackcoordinate.replaceAll("[^0-9]", "")) - 1;
-        attackboard[row][column] = "X";
+        attackboard[row][column] = attackedsymbol;
     }
 
     public void PrintAttackBoard() {

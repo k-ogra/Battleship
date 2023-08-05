@@ -1,18 +1,20 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 public class PlayerBoard {
     final int BOARD_SIZE = 10;
 
     public ArrayList<Ship> ships;
     public String[][] playerboard = new String[BOARD_SIZE][BOARD_SIZE];
 
-
+    public HashSet<String> sunkenships;
 
     public PlayerBoard() {
         for (String[] row: playerboard) {
             Arrays.fill(row, "~");
         }
         this.ships = new ArrayList<>();
+        this.sunkenships = new HashSet<String>();
     }
 
     public void PrintPlayerBoard() {
@@ -62,17 +64,19 @@ public class PlayerBoard {
         }
     }
 
-    public void Attacked(String attackcoordinate) {
+    public String Attacked(String attackcoordinate) {
         int row = attackcoordinate.charAt(0) - 65;
         int column = Integer.parseInt(attackcoordinate.replaceAll("[^0-9]", "")) - 1;
         if (playerboard[row][column] == "O") {
             System.out.println("A ship has been hit!");
+            playerboard[row][column] = "X";
+            return "X";
         }
         else {
             System.out.println("Attack missed!");
+            playerboard[row][column] = "M";
+            return "M";
         }
-        playerboard[row][column] = "X";
-
     }
 
     public boolean CheckGameOver() {
@@ -81,6 +85,7 @@ public class PlayerBoard {
             ship.CheckIfSunk();
             if (ship.isSunk) {
                 sunkcounter++;
+                sunkenships.add(ship.name);
             }
         }
         if (sunkcounter == 5) {

@@ -8,8 +8,8 @@ public class UI {
 
     public void Start() {
         System.out.println("Welcome to Battleship!");
-        Player player1 = new Player("Player1");
-        Player player2 = new Player("Player2");
+        Player player1 = new Player("Player 1");
+        Player player2 = new Player("Player 2");
         player1.playerboard.PrintPlayerBoard();
         SelectShips(player1, player2);
     }
@@ -20,7 +20,7 @@ public class UI {
         int shiplength = 0;
         int shipsplaced = 0;
         String coordinates = "";
-        while (playername != "Player2" || shipsplaced != 5) {
+        while (playername != "Player 2" || shipsplaced != 5) {
             System.out.println(playername + " select a ship to place (Carrier, Battleship, Submarine, Cruiser, or Destroyer): ");
             String currentshipname = scanner.nextLine();
             if (!currentplayer.playerboard.ships.isEmpty()) {
@@ -29,11 +29,11 @@ public class UI {
                 for (Ship ship : currentplayer.playerboard.ships) {
                     if (ship.name.equals(currentshipname)) {
                         currentship = ship;
-                        currentship.beenPlaced = true;
                         break;
                     }
                 }
                 if (currentship.beenPlaced && currentship.name.equals(currentshipname)) {
+                    System.out.println("This ship has already been placed");
                     continue;
                 }
             }
@@ -62,28 +62,32 @@ public class UI {
                 }
                 break;
             }
-
-            String firstCoordinate = coordinates.split(" ")[0];
-            String secondCoordinate = coordinates.split(" ")[1];
+            String firstCoordinate = coordinates.split(" ")[0].toUpperCase();
+            String secondCoordinate = coordinates.split(" ")[1].toUpperCase();
             switch (currentshipname) {
                 case "Carrier":
                     Ship carrier = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
+                    carrier.beenPlaced = true;
                     currentplayer.playerboard.ships.add(carrier);
                     break;
                 case "Battleship":
                     Ship battleship = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
+                    battleship.beenPlaced = true;
                     currentplayer.playerboard.ships.add(battleship);
                     break;
                 case "Submarine":
                     Ship submarine = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
+                    submarine.beenPlaced = true;
                     currentplayer.playerboard.ships.add(submarine);
                     break;
                 case "Cruiser":
                     Ship cruiser = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
+                    cruiser.beenPlaced = true;
                     currentplayer.playerboard.ships.add(cruiser);
                     break;
                 case "Destroyer":
                     Ship destroyer = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
+                    destroyer.beenPlaced = true;
                     currentplayer.playerboard.ships.add(destroyer);
                     break;
                 default:
@@ -94,7 +98,7 @@ public class UI {
             currentplayer.playerboard.PlaceShip(firstCoordinate, secondCoordinate);
             currentplayer.playerboard.PrintPlayerBoard();
             shipsplaced++;
-            if (shipsplaced == 5 && playername == "Player1") {
+            if (shipsplaced == 5 && playername == "Player 1") {
                 currentplayer = player2;
                 shipsplaced = 0;
                 playername = currentplayer.name;
@@ -109,13 +113,25 @@ public class UI {
             System.out.println("Invalid coordinates");
             return false;
         }
-        String firstCoordinate = coordinates.split(" ")[0];
-        String secondCoordinate = coordinates.split(" ")[1];
-        if ((firstCoordinate.charAt(0) - 65 > 9 || firstCoordinate.charAt(0) - 65 < 0) || (secondCoordinate.charAt(0) - 65 > 9 || secondCoordinate.charAt(0) - 65 < 0)) {
+        String firstCoordinate = coordinates.split(" ")[0].toUpperCase();
+        String secondCoordinate = coordinates.split(" ")[1].toUpperCase();
+        if (!Character.toString(firstCoordinate.charAt(0)).matches("^[a-zA-Z]*$")) {
             System.out.println("Invalid coordinates");
             return false;
         }
-        else if ((Integer.parseInt(firstCoordinate.replaceAll("[^0-9]", "")) - 1 > 9 || Integer.parseInt(firstCoordinate.replaceAll("[^0-9]", "")) - 1 < 0) || (Integer.parseInt(secondCoordinate.replaceAll("[^0-9]", "")) - 1 > 9 || Integer.parseInt(secondCoordinate.replaceAll("[^0-9]", "")) - 1 < 0)) {
+
+        else if ((firstCoordinate.charAt(0) - 65 > 9 || firstCoordinate.charAt(0) - 65 < 0) || (secondCoordinate.charAt(0) - 65 > 9 || secondCoordinate.charAt(0) - 65 < 0)) {
+            System.out.println("Invalid coordinates");
+            return false;
+        }
+
+        try {
+            if ((Integer.parseInt(firstCoordinate.replaceAll("[^0-9]", "")) - 1 > 9 || Integer.parseInt(firstCoordinate.replaceAll("[^0-9]", "")) - 1 < 0) || (Integer.parseInt(secondCoordinate.replaceAll("[^0-9]", "")) - 1 > 9 || Integer.parseInt(secondCoordinate.replaceAll("[^0-9]", "")) - 1 < 0)) {
+                System.out.println("Invalid coordinates");
+                return false;
+            }
+        }
+        catch (NumberFormatException nfe) {
             System.out.println("Invalid coordinates");
             return false;
         }
@@ -125,6 +141,10 @@ public class UI {
         int endcolumn = Integer.parseInt(secondCoordinate.replaceAll("[^0-9]", "")) - 1;
         if (Math.abs(startrow - endrow) + 1 != shiplength && Math.abs(startcolumn - endcolumn) + 1 != shiplength) {
             System.out.println("Invalid coordinates");
+            return false;
+        }
+        else if (startrow != endrow && startcolumn != endcolumn) {
+            System.out.println("Ship cannot be placed diagonally");
             return false;
         }
         else if (startrow == endrow) {
@@ -150,6 +170,11 @@ public class UI {
         if (attackcoordinate.length() != 3 && attackcoordinate.length() != 2) {
             return false;
         }
+        attackcoordinate = attackcoordinate.toUpperCase();
+        if (!Character.toString(attackcoordinate.charAt(0)).matches("^[a-zA-Z]*$")) {
+            System.out.println("Invalid coordinates");
+            return false;
+        }
         else if (attackcoordinate.charAt(0) - 65 > 9 || attackcoordinate.charAt(0) - 65 < 0) {
             return false;
         }
@@ -161,9 +186,9 @@ public class UI {
     }
 
     public boolean isNewAttackCoordinate(String attackcoordinate, Player currentplayer) {
-        int row = attackcoordinate.charAt(0);
+        int row = attackcoordinate.charAt(0) - 65;
         int column = Integer.parseInt(attackcoordinate.replaceAll("[^0-9]", "")) - 1;
-        if (currentplayer.attackboard.attackboard[row][column].equals("X")) {
+        if (currentplayer.attackboard.attackboard[row][column].equals("X") || currentplayer.attackboard.attackboard[row][column].equals("M")) {
             return false;
         }
         return true;
@@ -193,23 +218,33 @@ public class UI {
                 }
                 break;
             }
-            currentplayer.attackboard.Attack(attackcoordinate);
+
             if (currentplayer == player1) {
-                player2.playerboard.Attacked(attackcoordinate);
+                String attackedsymbol = player2.playerboard.Attacked(attackcoordinate);
+                currentplayer.attackboard.Attack(attackcoordinate, attackedsymbol);
+                if (player2.playerboard.CheckGameOver()) {
+                    break;
+                }
+                System.out.println("Player 1's sunken ships: " + player1.playerboard.sunkenships);
                 currentplayer = player2;
                 playername = currentplayer.name;
             }
             else if (currentplayer == player2) {
-                player1.playerboard.Attacked(attackcoordinate);
+                String attackedsymbol = player1.playerboard.Attacked(attackcoordinate);
+                currentplayer.attackboard.Attack(attackcoordinate, attackedsymbol);
+                if (player1.playerboard.CheckGameOver()) {
+                    break;
+                }
+                System.out.println("Player 2's sunken ships: " + player2.playerboard.sunkenships);
                 currentplayer = player1;
                 playername = currentplayer.name;
             }
         }
-        if (currentplayer.name == "Player1") {
-            System.out.println("Player2 has won!");
+        if (currentplayer.name == "Player 1") {
+            System.out.println("Player 1 has won!");
         }
-        if (currentplayer.name == "Player2") {
-            System.out.println("Player1 has won!");
+        if (currentplayer.name == "Player 2") {
+            System.out.println("Player 2 has won!");
         }
     }
 }
