@@ -1,30 +1,40 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+
+/**
+ * Class representing a player's own board that contains their ships
+ */
 public class PlayerBoard {
     final int BOARD_SIZE = 10;
-
+    public final int A_ASCII_VALUE = 65;
     public ArrayList<Ship> ships;
-    public String[][] playerboard = new String[BOARD_SIZE][BOARD_SIZE];
+    public String[][] board = new String[BOARD_SIZE][BOARD_SIZE];
 
-    public HashSet<String> sunkenships;
+    public HashSet<String> sunkenShips;
 
+    /**
+     * Creates a player's own board
+     */
     public PlayerBoard() {
-        for (String[] row: playerboard) {
+        for (String[] row: board) {
             Arrays.fill(row, "~");
         }
         this.ships = new ArrayList<>();
-        this.sunkenships = new HashSet<String>();
+        this.sunkenShips = new HashSet<>();
     }
 
-    public void PrintPlayerBoard() {
+    /**
+     * Prints a player's board containing their ships
+     */
+    public void printPlayerBoard() {
         System.out.println("  1 2 3 4 5 6 7 8 9 10");
         int asciiValue = 65;
         for (int i = 0; i < BOARD_SIZE; i++) {
             System.out.print((char) asciiValue + " ");
             asciiValue++;
             for (int j = 0; j < BOARD_SIZE; j++) {
-                System.out.print(playerboard[i][j] + " ");
+                System.out.print(board[i][j] + " ");
                 if (j == BOARD_SIZE - 1) {
                     System.out.print("\n");
                 }
@@ -32,66 +42,74 @@ public class PlayerBoard {
         }
     }
 
-    public void PlaceShip(String firstcoordinate, String secondcoordinate) {
-        int startrow = firstcoordinate.charAt(0) - 65;
-        int endrow = secondcoordinate.charAt(0) - 65;
-        int startcolumn = Integer.parseInt(firstcoordinate.replaceAll("[^0-9]", "")) - 1;
-        int endcolumn = Integer.parseInt(secondcoordinate.replaceAll("[^0-9]", "")) - 1;
+    /**
+     * Places a ship given two coordinates
+     * @param firstCoordinate A coordinate for one end of the ship that should contain a letter and number
+     * @param secondCoordinate A coordinate for one end of the ship that should contain a letter and number
+     */
+    public void placeShip(String firstCoordinate, String secondCoordinate) {
+        int startRow = firstCoordinate.charAt(0) - A_ASCII_VALUE;
+        int endRow = secondCoordinate.charAt(0) - A_ASCII_VALUE;
+        int startColumn = Integer.parseInt(firstCoordinate.replaceAll("[^0-9]", "")) - 1;
+        int endColumn = Integer.parseInt(secondCoordinate.replaceAll("[^0-9]", "")) - 1;
 
-        if (startrow > endrow) {
-            int temp = startrow;
-            startrow = endrow;
-            endrow = temp;
+        if (startRow > endRow) {
+            int temp = startRow;
+            startRow = endRow;
+            endRow = temp;
         }
-        if (startcolumn > endcolumn) {
-            int temp = startcolumn;
-            startcolumn = endcolumn;
-            endcolumn = temp;
+        if (startColumn > endColumn) {
+            int temp = startColumn;
+            startColumn = endColumn;
+            endColumn = temp;
         }
 
-
-
-        // End MUST be greater than start
-        if (startrow == endrow) {
-            for (int i = startcolumn; i <= endcolumn; i++) {
-                playerboard[startrow][i] = "O";
+        if (startRow == endRow) {
+            for (int i = startColumn; i <= endColumn; i++) {
+                board[startRow][i] = "O";
             }
         }
-        else if (startcolumn == endcolumn) {
-            for (int i = startrow; i <= endrow; i++) {
-                playerboard[i][startcolumn] = "O";
+        else if (startColumn == endColumn) {
+            for (int i = startRow; i <= endRow; i++) {
+                board[i][startColumn] = "O";
             }
         }
     }
 
-    public String Attacked(String attackcoordinate) {
-        int row = attackcoordinate.charAt(0) - 65;
-        int column = Integer.parseInt(attackcoordinate.replaceAll("[^0-9]", "")) - 1;
-        if (playerboard[row][column] == "O") {
+    /**
+     * Checks if an attack is a hit or a miss
+     * @param attackCoordinate A single coordinate representing where an attack should go
+     * @return A string that represents a hit as "X" or a miss as "M"
+     */
+    public String checkAttack(String attackCoordinate) {
+        int row = attackCoordinate.charAt(0) - A_ASCII_VALUE;
+        int column = Integer.parseInt(attackCoordinate.replaceAll("[^0-9]", "")) - 1;
+        if (board[row][column].equals("O")) {
             System.out.println("A ship has been hit!");
-            playerboard[row][column] = "X";
+            board[row][column] = "X";
             return "X";
         }
         else {
             System.out.println("Attack missed!");
-            playerboard[row][column] = "M";
+            board[row][column] = "M";
             return "M";
         }
     }
 
+    /**
+     * Checks if the game is over by looking at the ships that are sunk
+     * @return Boolean representing whether all ships are sunk or not
+     */
     public boolean CheckGameOver() {
-        int sunkcounter = 0;
+        int sunkCounter = 0;
         for (Ship ship : ships) {
-            ship.CheckIfSunk();
+            ship.checkIfSunk();
             if (ship.isSunk) {
-                sunkcounter++;
-                sunkenships.add(ship.name);
+                sunkCounter++;
+                sunkenShips.add(ship.name);
             }
         }
-        if (sunkcounter == 5) {
-            return true;
-        }
-        return false;
+        return sunkCounter == 5;
 
     }
 

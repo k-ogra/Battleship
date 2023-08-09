@@ -1,114 +1,106 @@
 import java.util.Scanner;
+
+/**
+ * Class representing the user interface for Battleship
+ */
 public class UI {
 
-    Scanner scanner = new Scanner(System.in);
-    public UI() {
-        Start();
-    }
+    public final int CARRIER_LENGTH = 5;
+    public final int BATTLESHIP_LENGTH = 4;
+    public final int CRUISER_LENGTH = 3;
+    public final int DESTROYER_LENGTH = 2;
+    public final int A_ASCII_VALUE = 65;
+    public final int TOTAL_SHIPS = 5;
 
-    public void Start() {
+    Scanner scanner = new Scanner(System.in);
+
+    /**
+     * Starts the user interface
+     */
+    public UI() {
         System.out.println("Welcome to Battleship!");
         Player player1 = new Player("Player 1");
         Player player2 = new Player("Player 2");
-        player1.playerboard.PrintPlayerBoard();
-        SelectShips(player1, player2);
+        player1.playerBoard.printPlayerBoard();
+        selectShips(player1, player2);
     }
 
-    public void SelectShips(Player player1, Player player2) {
-        Player currentplayer = player1;
-        String playername = currentplayer.name;
-        int shiplength = 0;
-        int shipsplaced = 0;
-        String coordinates = "";
-        while (playername != "Player 2" || shipsplaced != 5) {
-            System.out.println(playername + " select a ship to place (Carrier, Battleship, Submarine, Cruiser, or Destroyer): ");
-            String currentshipname = scanner.nextLine();
-            if (!currentplayer.playerboard.ships.isEmpty()) {
 
-                Ship currentship = currentplayer.playerboard.ships.get(0);
-                for (Ship ship : currentplayer.playerboard.ships) {
-                    if (ship.name.equals(currentshipname)) {
-                        currentship = ship;
+    /**
+     * Asks players to select and enter the coordinates of each of the 5 ships so, they can be placed
+     * @param player1 Represents the player that makes the first move
+     * @param player2 Represents the player that makes the second move
+     */
+    public void selectShips(Player player1, Player player2) {
+        Player currentPlayer = player1;
+        String playerName = currentPlayer.name;
+        int shipLength;
+        int shipsPlaced = 0;
+        String coordinates;
+        while (!playerName.equals("Player 2") || shipsPlaced != TOTAL_SHIPS) {
+            System.out.println(playerName + " select a ship to place (Carrier, Battleship, Submarine, Cruiser, or Destroyer): ");
+            String currentShipName = scanner.nextLine();
+            if (!currentPlayer.playerBoard.ships.isEmpty()) {
+
+                Ship currentShip = currentPlayer.playerBoard.ships.get(0);
+                for (Ship ship : currentPlayer.playerBoard.ships) {
+                    if (ship.name.equals(currentShipName)) {
+                        currentShip = ship;
                         break;
                     }
                 }
-                if (currentship.beenPlaced && currentship.name.equals(currentshipname)) {
+                if (currentShip.beenPlaced && currentShip.name.equals(currentShipName)) {
                     System.out.println("This ship has already been placed");
                     continue;
                 }
             }
-            switch (currentshipname) {
-                case "Carrier":
-                    shiplength = 5;
-                    break;
-                case "Battleship":
-                    shiplength = 4;
-                    break;
-                case "Submarine", "Cruiser":
-                    shiplength = 3;
-                    break;
-                case "Destroyer":
-                    shiplength = 2;
-                    break;
-                default:
+            switch (currentShipName) {
+                case "Carrier" -> shipLength = CARRIER_LENGTH;
+                case "Battleship" -> shipLength = BATTLESHIP_LENGTH;
+                case "Submarine", "Cruiser" -> shipLength = CRUISER_LENGTH;
+                case "Destroyer" -> shipLength = DESTROYER_LENGTH;
+                default -> {
                     System.out.println("Invalid ship");
                     continue;
+                }
             }
             while (true) {
-                System.out.println("Please enter coordinates of " + currentshipname + " (Length " + shiplength + "):");
+                System.out.println("Please enter coordinates of " + currentShipName + " (Length " + shipLength + "):");
                 coordinates = scanner.nextLine();
-                if (!isValidCoordinates(coordinates, shiplength, currentplayer)) {
+                if (!isValidCoordinates(coordinates, shipLength, currentPlayer)) {
                     continue;
                 }
                 break;
             }
             String firstCoordinate = coordinates.split(" ")[0].toUpperCase();
             String secondCoordinate = coordinates.split(" ")[1].toUpperCase();
-            switch (currentshipname) {
-                case "Carrier":
-                    Ship carrier = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
-                    carrier.beenPlaced = true;
-                    currentplayer.playerboard.ships.add(carrier);
-                    break;
-                case "Battleship":
-                    Ship battleship = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
-                    battleship.beenPlaced = true;
-                    currentplayer.playerboard.ships.add(battleship);
-                    break;
-                case "Submarine":
-                    Ship submarine = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
-                    submarine.beenPlaced = true;
-                    currentplayer.playerboard.ships.add(submarine);
-                    break;
-                case "Cruiser":
-                    Ship cruiser = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
-                    cruiser.beenPlaced = true;
-                    currentplayer.playerboard.ships.add(cruiser);
-                    break;
-                case "Destroyer":
-                    Ship destroyer = new Ship(currentshipname, shiplength, firstCoordinate, secondCoordinate, currentplayer.playerboard);
-                    destroyer.beenPlaced = true;
-                    currentplayer.playerboard.ships.add(destroyer);
-                    break;
-                default:
-                    break;
-            }
+
+            Ship ship = new Ship(currentShipName, shipLength, firstCoordinate, secondCoordinate, currentPlayer.playerBoard);
+            ship.beenPlaced = true;
+            currentPlayer.playerBoard.ships.add(ship);
 
 
-            currentplayer.playerboard.PlaceShip(firstCoordinate, secondCoordinate);
-            currentplayer.playerboard.PrintPlayerBoard();
-            shipsplaced++;
-            if (shipsplaced == 5 && playername == "Player 1") {
-                currentplayer = player2;
-                shipsplaced = 0;
-                playername = currentplayer.name;
+            currentPlayer.playerBoard.placeShip(firstCoordinate, secondCoordinate);
+            currentPlayer.playerBoard.printPlayerBoard();
+            shipsPlaced++;
+            if (shipsPlaced == TOTAL_SHIPS && playerName.equals("Player 1")) {
+                currentPlayer = player2;
+                shipsPlaced = 0;
+                playerName = currentPlayer.name;
             }
         }
-        AttackShip(player1, player2);
+        attackShip(player1, player2);
 
     }
 
-    public boolean isValidCoordinates(String coordinates, int shiplength, Player currentplayer) {
+    /**
+     * Checks if the coordinates of a ship are valid or if they conflict with existing ships
+     * @param coordinates A String containing coordinates for a ship separated by a space
+     * @param shipLength Represents the length of a ship
+     * @param currentPlayer Represents the player who is currently entering coordinates
+     * @return A boolean that says whether the coordinates of a ship are valid
+     */
+    public boolean isValidCoordinates(String coordinates, int shipLength, Player currentPlayer) {
         if (coordinates.split(" ").length != 2) {
             System.out.println("Invalid coordinates");
             return false;
@@ -120,7 +112,7 @@ public class UI {
             return false;
         }
 
-        else if ((firstCoordinate.charAt(0) - 65 > 9 || firstCoordinate.charAt(0) - 65 < 0) || (secondCoordinate.charAt(0) - 65 > 9 || secondCoordinate.charAt(0) - 65 < 0)) {
+        else if ((firstCoordinate.charAt(0) - A_ASCII_VALUE > 9 || firstCoordinate.charAt(0) - A_ASCII_VALUE < 0) || (secondCoordinate.charAt(0) - A_ASCII_VALUE > 9 || secondCoordinate.charAt(0) - A_ASCII_VALUE < 0)) {
             System.out.println("Invalid coordinates");
             return false;
         }
@@ -135,29 +127,29 @@ public class UI {
             System.out.println("Invalid coordinates");
             return false;
         }
-        int startrow = firstCoordinate.charAt(0) - 65;
-        int endrow = secondCoordinate.charAt(0) - 65;
-        int startcolumn = Integer.parseInt(firstCoordinate.replaceAll("[^0-9]", "")) - 1;
-        int endcolumn = Integer.parseInt(secondCoordinate.replaceAll("[^0-9]", "")) - 1;
-        if (Math.abs(startrow - endrow) + 1 != shiplength && Math.abs(startcolumn - endcolumn) + 1 != shiplength) {
+        int startRow = firstCoordinate.charAt(0) - A_ASCII_VALUE;
+        int endRow = secondCoordinate.charAt(0) - A_ASCII_VALUE;
+        int startColumn = Integer.parseInt(firstCoordinate.replaceAll("[^0-9]", "")) - 1;
+        int endColumn = Integer.parseInt(secondCoordinate.replaceAll("[^0-9]", "")) - 1;
+        if (Math.abs(startRow - endRow) + 1 != shipLength && Math.abs(startColumn - endColumn) + 1 != shipLength) {
             System.out.println("Invalid coordinates");
             return false;
         }
-        else if (startrow != endrow && startcolumn != endcolumn) {
+        else if (startRow != endRow && startColumn != endColumn) {
             System.out.println("Ship cannot be placed diagonally");
             return false;
         }
-        else if (startrow == endrow) {
-            for (int i = startcolumn; i < endcolumn; i++) {
-                if (currentplayer.playerboard.playerboard[startrow][i] == "O") {
+        else if (startRow == endRow) {
+            for (int i = startColumn; i < endColumn; i++) {
+                if (currentPlayer.playerBoard.board[startRow][i].equals("O")) {
                     System.out.println("Coordinates conflict with existing ship");
                     return false;
                 }
             }
         }
-        else if (startcolumn == endcolumn) {
-            for (int i = startrow; i < endrow; i++) {
-                if (currentplayer.playerboard.playerboard[i][startcolumn] == "O") {
+        else {
+            for (int i = startRow; i < endRow; i++) {
+                if (currentPlayer.playerBoard.board[i][startColumn].equals("O")) {
                     System.out.println("Coordinates conflict with existing ship");
                     return false;
                 }
@@ -166,84 +158,94 @@ public class UI {
         return true;
     }
 
-    public boolean isValidAttackCoordinate(String attackcoordinate) {
-        if (attackcoordinate.length() != 3 && attackcoordinate.length() != 2) {
+    /**
+     * Checks if a coordinate for an attack is valid
+     * @param attackCoordinate A single coordinate representing where an attack should go
+     * @return A boolean that says whether the attack coordinate is valid
+     */
+    public boolean isValidAttackCoordinate(String attackCoordinate) {
+        if (attackCoordinate.length() != 3 && attackCoordinate.length() != 2) {
             return false;
         }
-        attackcoordinate = attackcoordinate.toUpperCase();
-        if (!Character.toString(attackcoordinate.charAt(0)).matches("^[a-zA-Z]*$")) {
+        attackCoordinate = attackCoordinate.toUpperCase();
+        if (!Character.toString(attackCoordinate.charAt(0)).matches("^[a-zA-Z]*$")) {
             System.out.println("Invalid coordinates");
             return false;
         }
-        else if (attackcoordinate.charAt(0) - 65 > 9 || attackcoordinate.charAt(0) - 65 < 0) {
+        else if (attackCoordinate.charAt(0) - A_ASCII_VALUE > 9 || attackCoordinate.charAt(0) - A_ASCII_VALUE < 0) {
             return false;
         }
-        else if (Integer.parseInt(attackcoordinate.replaceAll("[^0-9]", "")) - 1 > 9 || Integer.parseInt(attackcoordinate.replaceAll("[^0-9]", "")) - 1 < 0) {
-            return false;
-        }
-        return true;
+        else return Integer.parseInt(attackCoordinate.replaceAll("[^0-9]", "")) - 1 <= 9 && Integer.parseInt(attackCoordinate.replaceAll("[^0-9]", "")) - 1 >= 0;
 
     }
 
-    public boolean isNewAttackCoordinate(String attackcoordinate, Player currentplayer) {
-        int row = attackcoordinate.charAt(0) - 65;
-        int column = Integer.parseInt(attackcoordinate.replaceAll("[^0-9]", "")) - 1;
-        if (currentplayer.attackboard.attackboard[row][column].equals("X") || currentplayer.attackboard.attackboard[row][column].equals("M")) {
-            return false;
-        }
-        return true;
+    /**
+     * Checks if an attack coordinate has already been used
+     * @param attackCoordinate A single coordinate representing where an attack should go
+     * @param currentPlayer Represents the player who is currently entering an attack
+     * @return A boolean that says if an attack coordinate has already been used
+     */
+    public boolean isNewAttackCoordinate(String attackCoordinate, Player currentPlayer) {
+        int row = attackCoordinate.charAt(0) - A_ASCII_VALUE;
+        int column = Integer.parseInt(attackCoordinate.replaceAll("[^0-9]", "")) - 1;
+        return !currentPlayer.attackBoard.board[row][column].equals("X") && !currentPlayer.attackBoard.board[row][column].equals("M");
     }
 
-    public void AttackShip(Player player1, Player player2) {
-        Player currentplayer = player1;
-        String playername = currentplayer.name;
-        String attackcoordinate = "";
-        while (!currentplayer.playerboard.CheckGameOver()) {
+    /**
+     * Alternates between each player to allow them to place attacks and prints the winner when the game is finished
+     * @param player1 Represents the player that makes the first move
+     * @param player2 Represents the player that makes the second move
+     */
+    public void attackShip(Player player1, Player player2) {
+        Player currentPlayer = player1;
+        String playerName = currentPlayer.name;
+        String attackCoordinate;
+        while (!currentPlayer.playerBoard.CheckGameOver()) {
             System.out.println("************************");
             System.out.println("ATTACK BOARD");
-            currentplayer.attackboard.PrintAttackBoard();
+            currentPlayer.attackBoard.printAttackBoard();
             System.out.println("************************");
             System.out.println("PLAYER BOARD");
-            currentplayer.playerboard.PrintPlayerBoard();
+            currentPlayer.playerBoard.printPlayerBoard();
             while (true) {
-                System.out.println(playername + " enter coordinate for attack.");
-                attackcoordinate = scanner.nextLine();
-                if (!isValidAttackCoordinate(attackcoordinate)) {
+                System.out.println(playerName + " enter coordinate for attack.");
+                attackCoordinate = scanner.nextLine();
+                if (!isValidAttackCoordinate(attackCoordinate)) {
                     System.out.println("Invalid attack coordinate");
                     continue;
                 }
-                else if (!isNewAttackCoordinate(attackcoordinate, currentplayer)) {
+                else if (!isNewAttackCoordinate(attackCoordinate, currentPlayer)) {
                     System.out.println("This coordinate has already been attacked");
                     continue;
                 }
                 break;
             }
 
-            if (currentplayer == player1) {
-                String attackedsymbol = player2.playerboard.Attacked(attackcoordinate);
-                currentplayer.attackboard.Attack(attackcoordinate, attackedsymbol);
-                if (player2.playerboard.CheckGameOver()) {
+            String attackedSymbol;
+            if (currentPlayer == player1) {
+                attackedSymbol = player2.playerBoard.checkAttack(attackCoordinate);
+                currentPlayer.attackBoard.attack(attackCoordinate, attackedSymbol);
+                if (player2.playerBoard.CheckGameOver()) {
                     break;
                 }
-                System.out.println("Player 1's sunken ships: " + player1.playerboard.sunkenships);
-                currentplayer = player2;
-                playername = currentplayer.name;
+                System.out.println("Player 1's sunken ships: " + player1.playerBoard.sunkenShips);
+                currentPlayer = player2;
             }
-            else if (currentplayer == player2) {
-                String attackedsymbol = player1.playerboard.Attacked(attackcoordinate);
-                currentplayer.attackboard.Attack(attackcoordinate, attackedsymbol);
-                if (player1.playerboard.CheckGameOver()) {
+            else {
+                attackedSymbol = player1.playerBoard.checkAttack(attackCoordinate);
+                currentPlayer.attackBoard.attack(attackCoordinate, attackedSymbol);
+                if (player1.playerBoard.CheckGameOver()) {
                     break;
                 }
-                System.out.println("Player 2's sunken ships: " + player2.playerboard.sunkenships);
-                currentplayer = player1;
-                playername = currentplayer.name;
+                System.out.println("Player 2's sunken ships: " + player2.playerBoard.sunkenShips);
+                currentPlayer = player1;
             }
+            playerName = currentPlayer.name;
         }
-        if (currentplayer.name == "Player 1") {
+        if (currentPlayer.name.equals("Player 1")) {
             System.out.println("Player 1 has won!");
         }
-        if (currentplayer.name == "Player 2") {
+        if (currentPlayer.name.equals("Player 2")) {
             System.out.println("Player 2 has won!");
         }
     }
